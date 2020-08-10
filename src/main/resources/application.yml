@@ -1,0 +1,29 @@
+spring:
+ profiles:
+  active:
+   - local
+
+server:
+ port: 8080
+
+---
+
+spring:
+ profiles: local
+ datasource:
+  jdbc-url: jdbc:mariadb://192.168.99.100:3306/chatters?autoReconnection=true&zeroDateTimeBehavior=convertToNull&characterEncoding=utf8&allowMultiQueries=true
+  driver-class-name: org.mariadb.jdbc.Driver
+  username: root
+  password: chatters1@#
+  hikari:
+   max-lifetime: 30000
+   idle-timeout: 30000
+   connection-timeout: 30000
+   maximum-pool-size: 10
+   connection-test-query: SELECT 1
+
+logging:
+  level:
+    root: INFO
+    com.klover: DEBUG
+    jdbc.sqlonly: DEBUG
