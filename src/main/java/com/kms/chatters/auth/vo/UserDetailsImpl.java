@@ -18,6 +18,7 @@ public class UserDetailsImpl implements UserDetails {
     private static final long serialVersionUID = 1L;
 
     private String id;
+    private String member_name;
     private String password;
     private String role;
 
@@ -58,6 +59,10 @@ public class UserDetailsImpl implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public String getMemberName() {
+        return this.member_name;
     }
     
 }

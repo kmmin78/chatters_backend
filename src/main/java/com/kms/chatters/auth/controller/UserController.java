@@ -28,7 +28,6 @@ public class UserController {
 
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-
         Authentication authentication = 
                 authenticationManager.authenticate(
 				    new UsernamePasswordAuthenticationToken(
@@ -46,7 +45,8 @@ public class UserController {
 				.collect(Collectors.toList());
 
 		return ResponseEntity.ok(new JwtResponse(jwt, 
-												 userDetails.getUsername(), 
+												 userDetails.getUsername(),
+												 userDetails.getMemberName(), 
 												 roles));
 	}
 }
