@@ -1,6 +1,9 @@
 package com.kms.chatters.common.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.Date;
+import java.util.HashMap;
 
 import com.kms.chatters.auth.vo.UserDetailsImpl;
 import com.kms.chatters.common.constants.JwtConstants;
@@ -17,15 +20,22 @@ public class JwtUtils {
 	private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
 	//token 생성
-	public String generateJwtToken(Authentication authentication) {
+	public String generateJwtToken(Authentication authentication) throws UnsupportedEncodingException {
 
 		UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+		// HashMap<String, Object> headers = new HashMap<>();
+		// headers.put("typ", "JWT");
+		// headers.put("alg", "HS512");
+		//HashMap<String, Object> claims = new HashMap<>();
+		//claims.put("role", userPrincipal.getAuthorities());
 
 		return Jwts.builder()
 				.setSubject((userPrincipal.getUsername()))
+				//.setHeader(headers)
 				.setIssuedAt(new Date())
 				.setExpiration(new Date((new Date()).getTime() + JwtConstants.EXPIRATION_TIME))
-				.signWith(SignatureAlgorithm.HS512, JwtConstants.SECRET)
+				//.setClaims(claims)
+				.signWith(SignatureAlgorithm.HS512, JwtConstants.SECRET.getBytes())
 				.compact();
 	}
 
@@ -33,32 +43,37 @@ public class JwtUtils {
 	public String getUserNameFromJwtToken(String token) {
         return Jwts
                 .parser()
-                .setSigningKey(JwtConstants.SECRET)
+                .setSigningKey(JwtConstants.SECRET.getBytes())
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
 	}
 
 	//token 유효성 체크
-	public boolean validateJwtToken(String authToken) {
+	public String validateJwtToken(String authToken) throws UnsupportedEncodingException {
 		try {
-            Jwts
-                .parser()
-                .setSigningKey(JwtConstants.SECRET)
-                .parseClaimsJws(authToken);
-			return true;
+			// Jws<Claims> claims = 
+			Jwts
+				.parser()
+				.setSigningKey(JwtConstants.SECRET.getBytes())
+				.parseClaimsJws(authToken);
+			// String scope = (String) claims.getBody().get("role");
+			return "OK";
 		} catch (SignatureException e) {
 			logger.error("Invalid JWT signature: {}", e.getMessage());
+			return "INVALID_SIGNATURE";
 		} catch (MalformedJwtException e) {
 			logger.error("Invalid JWT token: {}", e.getMessage());
+			return "INVALID_TOKEN";
 		} catch (ExpiredJwtException e) {
 			logger.error("JWT token is expired: {}", e.getMessage());
+			return "EXPIRED";
 		} catch (UnsupportedJwtException e) {
 			logger.error("JWT token is unsupported: {}", e.getMessage());
+			return "UNSUPPORTED";
 		} catch (IllegalArgumentException e) {
 			logger.error("JWT claims string is empty: {}", e.getMessage());
+			return "JWT_CLAIMS_EMPTY";
 		}
-
-		return false;
 	}
 }

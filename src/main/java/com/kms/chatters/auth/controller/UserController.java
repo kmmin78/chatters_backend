@@ -1,5 +1,6 @@
 package com.kms.chatters.auth.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +28,7 @@ public class UserController {
 	JwtUtils jwtUtils;
 
 	@PostMapping("/login")
-	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
+	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) throws UnsupportedEncodingException {
         Authentication authentication = 
                 authenticationManager.authenticate(
 				    new UsernamePasswordAuthenticationToken(

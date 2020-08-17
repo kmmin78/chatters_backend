@@ -24,6 +24,7 @@ public class HomeController {
         result.put("username", ud.getUsername());
         result.put("password", ud.getPassword());
         result.put("role", ud.getAuthorities());
+        
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 }
