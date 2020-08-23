@@ -1,9 +1,7 @@
 package com.kms.chatters.common.utils;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
 import java.util.Date;
-import java.util.HashMap;
 
 import com.kms.chatters.auth.vo.UserDetailsImpl;
 import com.kms.chatters.common.constants.JwtConstants;
