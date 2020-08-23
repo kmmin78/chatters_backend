@@ -41,9 +41,13 @@ dependencies {
 	//https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
 	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
 
-	// implementation "io.jsonwebtoken:jjwt-api:0.11.0"
-	// implementation "io.jsonwebtoken:jjwt-jackson:0.11.0", {exclude group:'io.jsonwebtoken', module:'jjwt-api'}
-	// implementation "io.jsonwebtoken:jjwt-impl:0.11.0", {exclude group:'io.jsonwebtoken', module:'jjwt-api'}
+	//jjwt 최신버전
+	// dependencies {
+    // compile 'io.jsonwebtoken:jjwt-api:0.11.2'
+    // runtime 'io.jsonwebtoken:jjwt-impl:0.11.2', 'io.jsonwebtoken:jjwt-gson:0.11.2'
+	// Uncomment the next line if you want to use RSASSA-PSS (PS256, PS384, PS512) algorithms:
+	//'org.bouncycastle:bcprov-jdk15on:1.60',
+	//'io.jsonwebtoken:jjwt-jackson:0.11.2' // or 'io.jsonwebtoken:jjwt-gson:0.11.2' for gson
 
 
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {

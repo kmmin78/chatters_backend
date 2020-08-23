@@ -29,21 +29,24 @@ public class JwtUtils {
 		//HashMap<String, Object> claims = new HashMap<>();
 		//claims.put("role", userPrincipal.getAuthorities());
 
+		Date now = new Date();
+
 		return Jwts.builder()
 				.setSubject((userPrincipal.getUsername()))
 				//.setHeader(headers)
-				.setIssuedAt(new Date())
-				.setExpiration(new Date((new Date()).getTime() + JwtConstants.EXPIRATION_TIME))
+				.setIssuedAt(now)
+				.setExpiration(new Date(now.getTime() + JwtConstants.EXPIRATION_TIME))
+				.claim("test", "test body")
 				//.setClaims(claims)
-				.signWith(SignatureAlgorithm.HS512, JwtConstants.SECRET.getBytes())
+				.signWith(SignatureAlgorithm.HS512, JwtConstants.SECRET.getBytes("UTF-8"))
 				.compact();
 	}
 
 	//토큰 -> username 추출
-	public String getUserNameFromJwtToken(String token) {
+	public String getUserNameFromJwtToken(String token) throws ExpiredJwtException, UnsupportedJwtException, MalformedJwtException, SignatureException, IllegalArgumentException, UnsupportedEncodingException {
         return Jwts
                 .parser()
-                .setSigningKey(JwtConstants.SECRET.getBytes())
+                .setSigningKey(JwtConstants.SECRET.getBytes("UTF-8"))
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
@@ -55,19 +58,19 @@ public class JwtUtils {
 			// Jws<Claims> claims = 
 			Jwts
 				.parser()
-				.setSigningKey(JwtConstants.SECRET.getBytes())
+				.setSigningKey(JwtConstants.SECRET.getBytes("UTF-8"))
 				.parseClaimsJws(authToken);
 			// String scope = (String) claims.getBody().get("role");
 			return "OK";
+		} catch (ExpiredJwtException e) {
+			logger.error("JWT token is expired: {}", e.getMessage());
+			return "EXPIRED";
 		} catch (SignatureException e) {
 			logger.error("Invalid JWT signature: {}", e.getMessage());
 			return "INVALID_SIGNATURE";
 		} catch (MalformedJwtException e) {
 			logger.error("Invalid JWT token: {}", e.getMessage());
 			return "INVALID_TOKEN";
-		} catch (ExpiredJwtException e) {
-			logger.error("JWT token is expired: {}", e.getMessage());
-			return "EXPIRED";
 		} catch (UnsupportedJwtException e) {
 			logger.error("JWT token is unsupported: {}", e.getMessage());
 			return "UNSUPPORTED";

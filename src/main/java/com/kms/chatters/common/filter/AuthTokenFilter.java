@@ -41,7 +41,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
 		//before doFilter
 		String jwt = parseJwt(request);
-		String validResult = jwtUtils.validateJwtToken(jwt);
+		String validResult = "";
+		//최초 로그인 시에는 jwt가 존재하지 않음.
+		if(jwt != null){
+			validResult = jwtUtils.validateJwtToken(jwt);
+		}
 
 		//유효한 jwt일 경우
 		if (validResult.equals("OK")) {
@@ -99,9 +103,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
 	private String parseJwt(HttpServletRequest request) {
 		String headerAuth = request.getHeader("Authorization");
-
+		//token에 "" 붙어서 오면 제거해줘야함.
 		if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-			return headerAuth.substring(7, headerAuth.length());
+			return headerAuth.substring(7, headerAuth.length()).replaceAll("\"", "");
 		}
 
 		return null;
