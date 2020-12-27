@@ -22,6 +22,9 @@ public class ChatController {
         if(message.getType().equals("ENTER")){
             message.setMessage(message.getUser()+"님이 입장하였습니다.");
         }
+        if(message.getType().equals("EXIT")){
+            message.setMessage(message.getUser()+"님이 퇴장하였습니다.");
+        }
         webSocket.convertAndSend("/topic/all", message);
     }
     
