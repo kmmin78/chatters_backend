@@ -15,18 +15,29 @@ public class ChatController {
     @Autowired
     SimpMessagingTemplate webSocket;
     
-    @MessageMapping("/sendToAll")
+    @MessageMapping("/all/send")
     // @SendTo("/topic/all")
-    public void sendToAll(ChatMessage message) {
+    public void allSend(ChatMessage message) {
         // return message.getMessage();
-        if(message.getType().equals("ENTER")){
-            message.setMessage(message.getUser()+"님이 입장하였습니다.");
-        }
-        if(message.getType().equals("EXIT")){
-            message.setMessage(message.getUser()+"님이 퇴장하였습니다.");
-        }
+        // if(message.getType().equals("ENTER")){
+        //     message.setMessage(message.getMemberName()+"님이 입장하였습니다.");
+        // }
+        // if(message.getType().equals("EXIT")){
+        //     message.setMessage(message.getMemberName()+"님이 퇴장하였습니다.");
+        // }
+        webSocket.convertAndSend("/topic/all", message);
+    }
+
+    @MessageMapping("/all/enter")
+    public void allEnter(ChatMessage message){
+        message.setMessage(message.getMemberName()+"님이 입장하였습니다.");
         webSocket.convertAndSend("/topic/all", message);
     }
     
+    @MessageMapping("/all/exit")
+    public void allExit(ChatMessage message){
+        message.setMessage(message.getMemberName()+"님이 퇴장하였습니다.");
+        webSocket.convertAndSend("/topic/all", message);
+    }
 
 }
