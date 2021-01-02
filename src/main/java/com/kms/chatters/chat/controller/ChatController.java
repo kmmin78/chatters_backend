@@ -18,7 +18,7 @@ public class ChatController {
     
     @MessageMapping("/all/send")
     // @SendTo("/topic/all")
-    public void allSend(ChatMessage message, @Header("accessToken") String token) {
+    public void allSend(ChatMessage message, @Header("Authorization") String token) {
         // return message.getMessage();
         // if(message.getType().equals("ENTER")){
         //     message.setMessage(message.getMemberName()+"님이 입장하였습니다.");
@@ -26,7 +26,7 @@ public class ChatController {
         // if(message.getType().equals("EXIT")){
         //     message.setMessage(message.getMemberName()+"님이 퇴장하였습니다.");
         // }
-        System.out.println(token);
+        // System.out.println(token);
         webSocket.convertAndSend("/topic/all", message);
     }
 
@@ -36,15 +36,15 @@ public class ChatController {
     //스크립트가 실행되지 않기 때문에, 해당 내용이 publish되지 않는다.
     //그래서 StompInterceptor에서 해당 처리를 할 수 있도록 구현해야 한다.
     //추후 삭제해야 된다는 말.
-
+    
     @MessageMapping("/all/enter")
-    public void allEnter(ChatMessage message, @Header("accessToken") String token){
+    public void allEnter(ChatMessage message, @Header("Authorization") String token){
         message.setMessage(message.getMemberName()+"님이 입장하였습니다.");
         webSocket.convertAndSend("/topic/all", message);
     }
     
     @MessageMapping("/all/exit")
-    public void allExit(ChatMessage message, @Header("accessToken") String token){
+    public void allExit(ChatMessage message, @Header("Authorization") String token){
         message.setMessage(message.getMemberName()+"님이 퇴장하였습니다.");
         webSocket.convertAndSend("/topic/all", message);
     }

@@ -1,6 +1,6 @@
-package com.kms.chatters.config;
+package com.kms.chatters.chat.config;
 
-import com.kms.chatters.interceptor.StompInterceptor;
+import com.kms.chatters.chat.interceptor.StompInterceptor;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

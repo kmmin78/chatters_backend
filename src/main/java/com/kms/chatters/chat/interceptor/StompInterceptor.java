@@ -1,4 +1,4 @@
-package com.kms.chatters.interceptor;
+package com.kms.chatters.chat.interceptor;
 
 import java.security.Principal;
 import java.util.Optional;
@@ -28,13 +28,17 @@ public class StompInterceptor implements ChannelInterceptor{
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel){
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        String token = accessor.getFirstNativeHeader("accessToken");
-        System.out.println("token : " + token);
+        // String token = accessor.getFirstNativeHeader("Authorization");
+        // System.out.println("token : " + token);
         StompCommand stc = accessor.getCommand();
         // System.out.println(accessor.getMessage());
-        // System.out.println(message.toString());
+        System.out.println("message : " + message.toString());
         String destination = accessor.getDestination();
-        System.out.println("destination : " + destination);
+        // System.out.println("destination : " + destination);
+        //sessionId 이용하면 되겠다..
+        //subscribe일 때 db에 roomid(topic), sessionid, userid 매핑해놓으면 입장, 퇴장 구현할 수 있을 듯.
+        //대신 입장때는 topic <- 이건 destination으로 가져오네, userid (이건 token에서 꺼내자)는 header에 직접 추가해서 가져와야할듯?
+        System.out.println("sessionid : " + accessor.getSessionId());
         // jwt 검증 로직 추가.
         switch(stc) {
             case CONNECT :
