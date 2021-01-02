@@ -51,7 +51,7 @@ public class JwtUtils {
 	}
 
 	//token 유효성 체크
-	public String validateJwtToken(String authToken) throws UnsupportedEncodingException {
+	public String validateJwtToken(String authToken) {
 		try {
 			// Jws<Claims> claims = 
 			Jwts
@@ -75,6 +75,9 @@ public class JwtUtils {
 		} catch (IllegalArgumentException e) {
 			logger.error("JWT claims string is empty: {}", e.getMessage());
 			return "JWT_CLAIMS_EMPTY";
+		} catch (UnsupportedEncodingException e) {
+			logger.error("UnsupportedEncoding : {}", e.getMessage());
+			return "UNSUPPORTED_ENCODING";
 		}
 	}
 }
