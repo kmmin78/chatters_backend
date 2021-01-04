@@ -37,10 +37,12 @@ dependencies {
 	// https://mvnrepository.com/artifact/it.ozimov/embedded-redis
 	testCompile group: 'it.ozimov', name: 'embedded-redis', version: '0.7.2'
 
-
-
 	// https://mvnrepository.com/artifact/com.zaxxer/HikariCP
 	//compile group: 'com.zaxxer', name: 'HikariCP', version: '3.4.1'
+
+	
+	// https://mvnrepository.com/artifact/org.springframework.security/spring-security-messaging
+	compile group: 'org.springframework.security', name: 'spring-security-messaging', version: '5.4.2'
 
 	//jjwt
 	//https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt

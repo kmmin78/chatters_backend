@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import io.jsonwebtoken.*;
 
@@ -79,5 +80,14 @@ public class JwtUtils {
 			logger.error("UnsupportedEncoding : {}", e.getMessage());
 			return "UNSUPPORTED_ENCODING";
 		}
+	}
+
+	public String parseJwt(String token) {
+		//token에 "" 붙어서 오면 제거해줘야함.
+		if (StringUtils.hasText(token) && token.startsWith("Bearer ")) {
+			return token.substring(7, token.length()).replaceAll("\"", "");
+		}
+
+		return null;
 	}
 }

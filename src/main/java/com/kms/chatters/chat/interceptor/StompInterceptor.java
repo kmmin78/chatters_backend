@@ -3,9 +3,12 @@ package com.kms.chatters.chat.interceptor;
 import java.security.Principal;
 import java.util.Optional;
 
+import com.kms.chatters.auth.service.UserDetailsServiceImpl;
 import com.kms.chatters.chat.vo.ChatMessage;
 import com.kms.chatters.common.utils.JwtUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -14,6 +17,10 @@ import org.springframework.messaging.simp.stomp.StompClientSupport;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,15 +29,21 @@ public class StompInterceptor implements ChannelInterceptor{
     @Autowired
     private JwtUtils ju;
 
+    @Autowired
+	private UserDetailsServiceImpl userDetailsService;
+
     // @Autowired
     // SimpMessagingTemplate webSocket;
+
+    private static final Logger logger = LoggerFactory.getLogger(StompInterceptor.class);
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel){
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        // String token = accessor.getFirstNativeHeader("Authorization");
-        // System.out.println("token : " + token);
+        String token = accessor.getFirstNativeHeader("Authorization");
+        System.out.println("token : " + token);
         StompCommand stc = accessor.getCommand();
+        
         // System.out.println(accessor.getMessage());
         System.out.println("message : " + message.toString());
         String destination = accessor.getDestination();
@@ -39,14 +52,43 @@ public class StompInterceptor implements ChannelInterceptor{
         //subscribe일 때 db에 roomid(topic), sessionid, userid 매핑해놓으면 입장, 퇴장 구현할 수 있을 듯.
         //대신 입장때는 topic <- 이건 destination으로 가져오네, userid (이건 token에서 꺼내자)는 header에 직접 추가해서 가져와야할듯?
         System.out.println("sessionid : " + accessor.getSessionId());
-        // jwt 검증 로직 추가.
+
+        
+
+        // jwt 검증 로직 추가 필요.
         switch(stc) {
             case CONNECT :
 
-            //접속할 땐, JWT 검증을 거치고, JWT가 올바르지 않다면 멈춰야되는데.. 
+            //websocket security로 해봤는데, 잘 안된다. 분명 accessor에 setUser만 잘하면 다음 요청부터는 인증 안해도 될텐데.. 흠.
+            //심지어 CONNECT authenticated로 해놓으면 이 부분을 타지도 않음.
+
+            //유효한 jwt일 경우
+            // String jwt = ju.parseJwt(token);
+            // String validResult = "";
+            // if(jwt != null){
+            //     validResult = ju.validateJwtToken(jwt);
+            // }
+            // if (validResult.equals("OK")) {
+            //     try {
+                    
+            //         String username = ju.getUserNameFromJwtToken(jwt);
+
+            //         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            //         UsernamePasswordAuthenticationToken authentication = 
+            //             new UsernamePasswordAuthenticationToken(
+            //                 userDetails, 
+            //                 null, 
+            //                 userDetails.getAuthorities()
+            //             );
+                        
+            //         accessor.setUser(authentication);
+            //     } catch (Exception e) {
+            //         logger.error("Cannot set user authentication: {}", e);
+            //     }
+            // }
 
             System.out.println("STOMP CONNECTED");
-            // ju.validateJwtToken(token);
+
             break;
 
             case SUBSCRIBE :
@@ -72,31 +114,6 @@ public class StompInterceptor implements ChannelInterceptor{
 
             break;
         }
-        // if(StompCommand.CONNECT == stc){
-        //     System.out.println("STOMP CONNECTED");
-        //     // if(ju.validateJwtToken(token).equals("OK")){
-        //     //     return message;
-        //     // }
-        // }else if(StompCommand.SUBSCRIBE == stc){
-        //     System.out.println("STOMP SUBSCRIBED");
-        //     //채팅방 인원 수 +
-
-        //     // webSocket.convertAndSend(
-        //     //     destination, 
-        //     //     ChatMessage.builder().
-        //     // );
-
-        // }else if(StompCommand.DISCONNECT == stc){
-        //     System.out.println("STOMP DISCONNECTED");
-        //     //채팅방 인원 수 -
-
-        // }else if(StompCommand.SEND == stc){
-        //     System.out.println("STOMP SEND");
-        // }
-
-        // System.out.println("token : " + token);
-        // 테스트 완료
-        // System.out.println("클라이언트 인바운드 테스트");
         return message;
     }
     
