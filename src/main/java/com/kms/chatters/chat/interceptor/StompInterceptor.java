@@ -1,59 +1,51 @@
 package com.kms.chatters.chat.interceptor;
 
-import java.security.Principal;
-import java.util.Optional;
+import javax.annotation.PostConstruct;
 
-import com.kms.chatters.auth.service.UserDetailsServiceImpl;
+import com.kms.chatters.chat.dao.ChatRoomRepository;
+import com.kms.chatters.chat.dao.ChatSessionRepository;
+import com.kms.chatters.chat.redis.RedisPublisher;
 import com.kms.chatters.chat.vo.ChatMessage;
 import com.kms.chatters.common.utils.JwtUtils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.messaging.simp.stomp.StompClientSupport;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
-@Component
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
 public class StompInterceptor implements ChannelInterceptor{
 
-    @Autowired
-    private JwtUtils ju;
+    private final JwtUtils ju;
+    // private final UserDetailsServiceImpl userDetailsService;
+    private final ChatRoomRepository chatRoomRepository;
+    private final ChatSessionRepository chatSessionRepository;
+    private final RedisPublisher redisPublisher;
 
-    @Autowired
-	private UserDetailsServiceImpl userDetailsService;
+    // private static final Logger logger = LoggerFactory.getLogger(StompInterceptor.class);
 
-    // @Autowired
-    // SimpMessagingTemplate webSocket;
-
-    private static final Logger logger = LoggerFactory.getLogger(StompInterceptor.class);
+    //인터셉터에서 연결, 연결해제 이벤트 감지해서 브로드캐스팅 하려고 했지만,
+    //이 인터셉터 자체는 메세지 보낼 때마다 호출되어서 그런지, 브로드캐스팅이나 레디스에 세션 넣는
+    //관련 로직이 들어가면 순환참조 혹은 에러 발생... 따라서 인터셉터가 아닌 웹소켓 세션 연결, 해제
+    //이벤트 감지 하는 리스너를 통해서 작업할 예정.
 
     @Override
     public Message<?> preSend(Message<?> message, MessageChannel channel){
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-        String token = accessor.getFirstNativeHeader("Authorization");
-        System.out.println("token : " + token);
         StompCommand stc = accessor.getCommand();
-        
-        // System.out.println(accessor.getMessage());
-        System.out.println("message : " + message.toString());
-        String destination = accessor.getDestination();
-        // System.out.println("destination : " + destination);
-        //sessionId 이용하면 되겠다..
-        //subscribe일 때 db에 roomid(topic), sessionid, userid 매핑해놓으면 입장, 퇴장 구현할 수 있을 듯.
-        //대신 입장때는 topic <- 이건 destination으로 가져오네, userid (이건 token에서 꺼내자)는 header에 직접 추가해서 가져와야할듯?
-        System.out.println("sessionid : " + accessor.getSessionId());
 
-        
+        String session = accessor.getSessionId();
+        String roomId = accessor.getFirstNativeHeader("roomId");
+        String username = accessor.getFirstNativeHeader("username");
+        String memberName = accessor.getFirstNativeHeader("memberName");
+        // String token = accessor.getFirstNativeHeader("Authorization");
+        // String destination = accessor.getDestination();
 
         // jwt 검증 로직 추가 필요.
         switch(stc) {
@@ -93,7 +85,24 @@ public class StompInterceptor implements ChannelInterceptor{
 
             case SUBSCRIBE :
 
+            System.out.println(session + " : " + roomId + " : " + username + " : " + memberName);
+            
+            //세션 저장
+            // chatSessionRepository.setSession(session, roomId, username, memberName);
             //접속 인원 +, 해당 방 유저들에게 입장했다고 알려야 함. destination, memberName 필요.
+            //역시 에러...
+            // redisPublisher.publish(
+            //     chatRoomRepository.getTopic(roomId), 
+            //     ChatMessage
+            //         .builder()
+            //         .roomId(roomId)
+            //         .username(username)
+            //         .memberName(memberName)
+            //         .type(ChatMessage.MessageType.ENTER)
+            //         .message(memberName + "님이 입장하였습니다.")
+            //         .sendDate("")
+            //         .build()
+            // );
             
             System.out.println("STOMP SUBSCRIBED");
             break;
@@ -116,6 +125,5 @@ public class StompInterceptor implements ChannelInterceptor{
         }
         return message;
     }
-    
     
 }

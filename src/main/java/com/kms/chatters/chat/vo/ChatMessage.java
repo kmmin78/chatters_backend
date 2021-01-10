@@ -11,7 +11,8 @@ public class ChatMessage {
     public enum MessageType {
         ENTER, EXIT, MESSAGE
     }
-
+    
+    private String roomId;
     private String username;
     private String memberName;
     private MessageType type;
@@ -25,12 +26,14 @@ public class ChatMessage {
 
     @Builder
     public ChatMessage(
+        String roomId,
         String username, 
         String memberName, 
         MessageType type, 
         String message, 
         String sendDate
     ) {
+        this.roomId = roomId;
         this.username = username;
         this.memberName = memberName;
         this.type = type;
