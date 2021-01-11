@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class ChatSessionRepository {
     private final RedisTemplate<String, Object> redisTemplate;
     private HashOperations<String, String, ChatSession> chatSessionHashOps;
-    private static final String SESSIONS = "SESSIONS";
+    private static final String CHAT_SESSIONS = "CHAT_SESSIONS";
 
     @PostConstruct
     private void init() {
@@ -29,10 +29,14 @@ public class ChatSessionRepository {
                                              .username(username)
                                              .memberName(memberName)
                                              .build();
-        chatSessionHashOps.put(SESSIONS, chatSession.getSession(), chatSession);
+        chatSessionHashOps.put(CHAT_SESSIONS, chatSession.getSession(), chatSession);
     }
 
     public ChatSession getSession(String session) {
-        return chatSessionHashOps.get(SESSIONS, session);
+        return chatSessionHashOps.get(CHAT_SESSIONS, session);
+    }
+
+    public void deleteSession(String session) {
+        chatSessionHashOps.delete(CHAT_SESSIONS, session);
     }
 }

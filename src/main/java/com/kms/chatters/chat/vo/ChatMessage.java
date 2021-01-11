@@ -13,6 +13,7 @@ public class ChatMessage {
     }
     
     private String roomId;
+    private long userCount;
     private String username;
     private String memberName;
     private MessageType type;
@@ -27,6 +28,7 @@ public class ChatMessage {
     @Builder
     public ChatMessage(
         String roomId,
+        long userCount,
         String username, 
         String memberName, 
         MessageType type, 
@@ -34,6 +36,7 @@ public class ChatMessage {
         String sendDate
     ) {
         this.roomId = roomId;
+        this.userCount = userCount;
         this.username = username;
         this.memberName = memberName;
         this.type = type;
