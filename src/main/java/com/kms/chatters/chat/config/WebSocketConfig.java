@@ -27,7 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer{
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/chatters")
+        registry.addEndpoint("/chatting", "/ccu")
                 // .setAllowedOrigins("http://localhost:3000")
                 .setAllowedOrigins("*")
                 .withSockJS();

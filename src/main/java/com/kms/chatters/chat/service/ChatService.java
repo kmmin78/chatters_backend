@@ -34,9 +34,9 @@ public class ChatService {
     //메세지 보내기
     public void sendChatMessage(ChatMessage message) {
         //유저 접속 수 세팅
-        // message.setUserCount(
-        //     chatRoomRepository.getUserCount(message.getRoomId())
-        // );
+        message.setUserCount(
+            chatRoomRepository.getUserCount(message.getRoomId())
+        );
         //redis에 메세지 발행
         redisTemplate.convertAndSend(channelTopic.getTopic(), message);
     }

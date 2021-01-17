@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import com.kms.chatters.chat.vo.ChatRoom;
 
@@ -21,14 +22,17 @@ public class ChatRoomRepository {
     //redis
     private static final String CHAT_ROOMS = "CHAT_ROOMS";
     private static final String USER_COUNT = "USER_COUNT";
-    private final RedisTemplate<String, Object> redisTemplate;
+    // private final RedisTemplate<String, Object> redisTemplate;
     //redis에서 hash 자료형을 다룰 수 있는 인터페이스. (key - hashkey - value)
+    @Resource(name="redisTemplate") //RedisConfig에서 생성한 Bean을 주입받음.
     private HashOperations<String, String, ChatRoom> chatRoomHashOps;
+    @Resource(name="redisTemplate")
     private ValueOperations<String, String> chatRoomValueOps;
 
     @PostConstruct
     private void init() {
-        chatRoomHashOps = redisTemplate.opsForHash();
+        // 위처럼 Resource 어노테이션으로 따로 주입해주지 않으면 아래처럼 초기화 해줘야한다.
+        // chatRoomHashOps = redisTemplate.opsForHash();
         // topics = new HashMap<>();
 
         //전체 채팅방이 개설되어 있지 않으면, 개설.

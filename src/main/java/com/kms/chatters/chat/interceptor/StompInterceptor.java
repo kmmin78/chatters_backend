@@ -90,7 +90,7 @@ public class StompInterceptor implements ChannelInterceptor{
             //세션 저장
             chatService.setSession(session, roomId, username, memberName);
             //접속 수 +1
-            // chatService.increaseUserCount(roomId);
+            chatService.increaseUserCount(roomId);
             //입장 메세지 전송
             chatService.sendChatMessage(
                 ChatMessage
@@ -118,7 +118,7 @@ public class StompInterceptor implements ChannelInterceptor{
             //해당 세션 삭제
             chatService.deleteSession(session);
             //접속 수 -1
-            // chatService.decreaseUserCount(roomId);
+            chatService.decreaseUserCount(roomId);
 
             //접속 인원 -, 해당 방 유저들에게 퇴장했다고 알려야 함. destination, memberName 필요.
             chatService.sendChatMessage(
