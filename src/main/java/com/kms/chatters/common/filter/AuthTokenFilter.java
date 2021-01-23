@@ -10,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
-import com.kms.chatters.auth.service.UserDetailsServiceImpl;
+import com.kms.chatters.auth.vo.UserDetailsImpl;
 import com.kms.chatters.common.utils.JwtUtils;
 
 import org.slf4j.Logger;
@@ -18,8 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,8 +25,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtils jwtUtils;
 
-	@Autowired
-	private UserDetailsServiceImpl userDetailsService;
+	// @Autowired
+	// private UserDetailsServiceImpl userDetailsService;
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthTokenFilter.class);
 
@@ -38,61 +36,73 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         HttpServletResponse response, 
         FilterChain filterChain
         ) throws ServletException, IOException {
-
 		//before doFilter
 		String jwt = parseJwt(request);
 		String validResult = "";
 		//최초 로그인 시에는 jwt가 존재하지 않음.
 		if(jwt != null){
 			validResult = jwtUtils.validateJwtToken(jwt);
-		}
+			//유효한 jwt일 경우
+			if (validResult.equals("OK")) {
+				try {
+					
+					//token에서 username과 roles를 추출한다.
+					String username = jwtUtils.getUserNameFromJwtToken(jwt);
+					String roles = jwtUtils.getRolesFromJwtToken(jwt);
+					UserDetailsImpl userDetails = new UserDetailsImpl();
+					userDetails.setId(username);
+					userDetails.setRoles(roles);
+					//db에서 조회하는 방법. 현재 사용안함.
+					// UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+					// UsernamePasswordAuthenticationToken authentication = 
+					// 	new UsernamePasswordAuthenticationToken(
+					// 		userDetails, 
+					// 		null, 
+					// 		userDetails.getAuthorities()
+					// 	);
+					UsernamePasswordAuthenticationToken authentication = 
+						new UsernamePasswordAuthenticationToken(
+							userDetails, 
+							null, 
+							userDetails.getAuthorities()
+						);
+					// authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-		//유효한 jwt일 경우
-		if (validResult.equals("OK")) {
-			try {
-				
-				String username = jwtUtils.getUserNameFromJwtToken(jwt);
+					SecurityContextHolder.getContext().setAuthentication(authentication);
+					
+					// if you want to get UserDetails
+					// UserDetails userDetails =
+					// (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-				UsernamePasswordAuthenticationToken authentication = 
-					new UsernamePasswordAuthenticationToken(
-						userDetails, 
-						null, 
-						userDetails.getAuthorities()
-					);
-				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+					// userDetails.getUsername()
+					// userDetails.getPassword()
+					// userDetails.getAuthorities()
+					
+				} catch (Exception e) {
+					logger.error("Cannot set user authentication: {}", e);
+					System.out.println(e.getMessage());
+					e.printStackTrace();
+				}
+			//JWT TOKEN이 만료된 경우에는 바로 JSON 리턴.
+			// } else if (validResult.equals("EXPIRED")) {
+			} else {
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+				PrintWriter out = response.getWriter();
+				Gson gsonObj = new Gson();
+				HashMap<String, Object> resultMap = new HashMap<String, Object>();
+				try {
 
-				SecurityContextHolder.getContext().setAuthentication(authentication);
-				
-				// if you want to get UserDetails
-				// UserDetails userDetails =
-				// (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+					resultMap.put("JWT_RESULT", validResult);
+					out.print(gsonObj.toJson(resultMap));
 
-				// userDetails.getUsername()
-				// userDetails.getPassword()
-				// userDetails.getAuthorities()
-				
-			} catch (Exception e) {
-				logger.error("Cannot set user authentication: {}", e);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					out.flush();
+				}
+				return;
 			}
-		//JWT TOKEN이 만료된 경우에는 바로 JSON 리턴.
-		} else if (validResult.equals("EXPIRED")) {
-			response.setContentType("application/json");
-			response.setCharacterEncoding("UTF-8");
-			PrintWriter out = response.getWriter();
-			Gson gsonObj = new Gson();
-			HashMap<String, Object> resultMap = new HashMap<String, Object>();
-			try {
-
-				resultMap.put("JWT_RESULT", validResult);
-				out.print(gsonObj.toJson(resultMap));
-
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				out.flush();
-			}
-			return;
 		}
 
 		filterChain.doFilter(request, response);

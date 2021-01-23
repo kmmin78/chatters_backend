@@ -14,7 +14,7 @@ public interface UserMapper {
         "select ",
         " member_id as id,",
         " member_password as password,",
-        " member_role as role,",
+        " member_role as roles,",
         " member_name as member_name",
         " from tb_member_info",
         " where member_id = #{username}"

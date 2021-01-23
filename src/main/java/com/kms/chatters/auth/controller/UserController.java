@@ -45,6 +45,10 @@ public class UserController {
 				.map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 
+		//redis에 로그인 정보 저장 (username, jwt)
+		//로그인 정보가 없다면 생성
+		//로그인 정보가 존재한다면 update 하고 redis publish
+
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getUsername(),
 												 userDetails.getMemberName(), 

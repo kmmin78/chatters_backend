@@ -3,6 +3,7 @@ package com.kms.chatters.auth.vo;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -20,13 +21,19 @@ public class UserDetailsImpl implements UserDetails {
     private String id;
     private String member_name;
     private String password;
-    private String role;
+    private String roles;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<GrantedAuthority> authorities = new ArrayList<>();
-        GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + this.role);
-        authorities.add(authority);
+        String[] roles = this.roles.split(",");
+
+        Stream.of(roles).forEach(
+            role -> {
+                GrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
+                authorities.add(authority);
+            }
+        );
 
         return authorities;
     }
