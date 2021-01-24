@@ -38,14 +38,10 @@ public class StompInterceptor implements ChannelInterceptor{
         // String token = accessor.getFirstNativeHeader("Authorization");
         // String destination = accessor.getDestination();
 
-        // jwt 검증 로직 추가 필요.
         switch(stc) {
             case CONNECT :
-
-                //websocket security로 해봤는데, 잘 안된다. 분명 accessor에 setUser만 잘하면 다음 요청부터는 인증 안해도 될텐데.. 흠.
-                //심지어 CONNECT authenticated로 해놓으면 이 부분을 타지도 않음.
-
-                //유효한 jwt일 경우
+                // 도저히 jwt 인증은 해결 안되네..
+                // authentication 객체를 어디다 담아야 websocket security에서 통과시켜줄까?
                 // String jwt = ju.parseJwt(token);
                 // String validResult = "";
                 // if(jwt != null){
@@ -54,23 +50,28 @@ public class StompInterceptor implements ChannelInterceptor{
                 // if (validResult.equals("OK")) {
                 //     try {
                         
-                //         String username = ju.getUserNameFromJwtToken(jwt);
-
-                //         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                //         username = ju.getUserNameFromJwtToken(jwt);
+                //         roles = ju.getRolesFromJwtToken(jwt);
+                //         UserDetailsImpl userDetails = new UserDetailsImpl();
+                //         userDetails.setId(username);
+                //         userDetails.setRoles(roles);
                 //         UsernamePasswordAuthenticationToken authentication = 
                 //             new UsernamePasswordAuthenticationToken(
                 //                 userDetails, 
                 //                 null, 
                 //                 userDetails.getAuthorities()
                 //             );
+
+                //         SecurityContextHolder.getContext().setAuthentication(authentication);
                             
                 //         accessor.setUser(authentication);
                 //     } catch (Exception e) {
-                //         logger.error("Cannot set user authentication: {}", e);
+                //         e.printStackTrace();
                 //     }
                 // }
+                
 
-                // System.out.println("STOMP CONNECTED");
+                System.out.println("STOMP CONNECTED");
 
                 break;
 
@@ -140,8 +141,6 @@ public class StompInterceptor implements ChannelInterceptor{
                             );
                         }
                     );
-                
-                //로그인 세션 처리
 
                 //세션 가져오기
                 // ChatSession chatSession = chatService.getSession(session);

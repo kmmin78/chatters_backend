@@ -12,7 +12,7 @@ import redis.embedded.RedisServer;
 @Profile("local")
 @Configuration
 public class EmbeddedRedisConfig {
-    @Value("${spring.redis.host")
+    @Value("${spring.redis.host}")
     private String host;
     @Value("${spring.redis.port}")
     private int redisPort;

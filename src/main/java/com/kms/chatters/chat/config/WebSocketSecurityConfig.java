@@ -10,7 +10,8 @@ public class WebSocketSecurityConfig extends AbstractSecurityWebSocketMessageBro
     
     @Override
     protected void configureInbound(MessageSecurityMetadataSourceRegistry messages) {
-        // 현재 websocket security 적용이 제대로 안됨.. 흠. 추후 확인 필요.
+        // 현재 websocket security 적용이 제대로 안됨. 공식문서도 여기만 설정하면 보안이 된다고하는데...
+        // 거르는 건 여기서 해주는게 맞는데, 그럼 인증 처리는 어디서 한다는거지????
         // messages.simpTypeMatchers(
         //     SimpMessageType.CONNECT,
         //     SimpMessageType.SUBSCRIBE,
