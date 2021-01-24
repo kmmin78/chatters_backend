@@ -31,7 +31,7 @@ public class ChatService {
             return "";
     }
 
-    //메세지 보내기
+    //메세지 보내기 (redis)
     public void sendChatMessage(ChatMessage message) {
         //유저 접속 수 세팅
         message.setUserCount(

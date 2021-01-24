@@ -2,19 +2,9 @@ package com.kms.chatters.chat.interceptor;
 
 import java.util.Optional;
 
-import javax.annotation.PostConstruct;
-
-import com.kms.chatters.chat.dao.ChatRoomRepository;
-import com.kms.chatters.chat.dao.ChatSessionRepository;
 import com.kms.chatters.chat.service.ChatService;
 import com.kms.chatters.chat.vo.ChatMessage;
-import com.kms.chatters.chat.vo.ChatSession;
-import com.kms.chatters.common.utils.JwtUtils;
 
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.listener.ChannelTopic;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
@@ -28,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class StompInterceptor implements ChannelInterceptor{
 
-    private final JwtUtils ju;
+    // private final JwtUtils ju;
     // private final UserDetailsServiceImpl userDetailsService;
     private final ChatService chatService;
 

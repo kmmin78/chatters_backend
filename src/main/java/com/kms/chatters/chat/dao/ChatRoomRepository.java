@@ -9,7 +9,7 @@ import javax.annotation.Resource;
 import com.kms.chatters.chat.vo.ChatRoom;
 
 import org.springframework.data.redis.core.HashOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+// import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Repository;
 
@@ -35,11 +35,29 @@ public class ChatRoomRepository {
         // chatRoomHashOps = redisTemplate.opsForHash();
         // topics = new HashMap<>();
 
-        //전체 채팅방이 개설되어 있지 않으면, 개설.
-        if(chatRoomHashOps.get(CHAT_ROOMS, "all") == null){
-            //방 개설
-            createChatRoom("전체채팅방", "all");
-        }
+        //2개의 RedisSubscriber에 messagingTemplate이 혼재할 경우,
+        //이상하게 이부분에서 오류가 남. init() 실행할 때 redis에 커넥션 오류발생... 원인은 진짜 불명
+        //messagingTemplate은 Stomp쪽인데 왜 여기랑 충돌이 나는지는 찾기가 어렵다.
+        //일단 채팅방은 현재는 따로 안쓰므로 주석처리했음.
+
+        //전체 채팅방이 개설되어 있지 않으면, 개설. (기존)
+        // if(chatRoomHashOps.get(CHAT_ROOMS, "all") == null){
+        //     //방 개설
+        //     createChatRoom("전체채팅방", "all");
+        // }
+
+        // 람다식으로 해봤음.
+        // Optional
+        //     .ofNullable(chatRoomHashOps.get(CHAT_ROOMS, "all"))
+        //     .ifPresentOrElse(
+        //         (chatRoom) -> {
+        //             System.out.println("all chat room is already exists!");
+        //         }, 
+        //         () -> {
+        //             //방 개설
+        //             createChatRoom("전체채팅방", "all");
+        //         }
+        //     );
     }
 
     public List<ChatRoom> findAllRoom() {

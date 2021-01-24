@@ -4,9 +4,11 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.kms.chatters.auth.service.UserService;
 import com.kms.chatters.auth.vo.JwtResponse;
 import com.kms.chatters.auth.vo.LoginRequest;
 import com.kms.chatters.auth.vo.UserDetailsImpl;
+import com.kms.chatters.auth.vo.UserJwtMessage;
 import com.kms.chatters.common.utils.JwtUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,9 @@ public class UserController {
 	@Autowired
 	JwtUtils jwtUtils;
 
+	@Autowired
+	UserService userService;
+
 	@PostMapping("/login")
 	public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) throws UnsupportedEncodingException {
         Authentication authentication = 
@@ -46,8 +51,15 @@ public class UserController {
 				.collect(Collectors.toList());
 
 		//redis에 로그인 정보 저장 (username, jwt)
-		//로그인 정보가 없다면 생성
-		//로그인 정보가 존재한다면 update 하고 redis publish
+		userService.setUserJwt(userDetails.getUsername(), jwt);
+		//메세지 발송 (기존 로그인 유저에게 username, token 보내서 비교)
+		userService.sendMessage(
+			UserJwtMessage
+				.builder()
+				.username(userDetails.getUsername())
+				.jwt(jwt)
+				.build()
+		);
 
 		return ResponseEntity.ok(new JwtResponse(jwt, 
 												 userDetails.getUsername(),
